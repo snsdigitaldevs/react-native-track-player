@@ -25,6 +25,7 @@ import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.extractor.DefaultExtractorsFactory
+import com.doublesymmetry.kotlinaudio.encrypt.CustomDataSourceFactory
 import com.doublesymmetry.kotlinaudio.utils.isUriLocalFile
 
 
@@ -70,9 +71,6 @@ class MediaFactory (
                 raw.open(DataSpec(uri))
                 DataSource.Factory { raw }
             }
-            isUriLocalFile(uri) -> {
-                DefaultDataSource.Factory(context)
-            }
             else -> {
                 val tempFactory = DefaultHttpDataSource.Factory().apply {
                     setUserAgent(userAgent)
@@ -83,7 +81,8 @@ class MediaFactory (
                     }
                 }
 
-                enableCaching(tempFactory)
+              val customFactory = CustomDataSourceFactory(context, null, tempFactory)
+              enableCaching(customFactory)
             }
         }
 
