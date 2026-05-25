@@ -263,30 +263,51 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
     public func update(options: [String: Any], resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) {
         if (rejectWhenNotInitialized(reject: reject)) { return }
 
-        var capabilitiesStr = options["capabilities"] as? [String] ?? []
-        if (capabilitiesStr.contains("play") && capabilitiesStr.contains("pause")) {
-            capabilitiesStr.append("togglePlayPause");
-        }
-
         forwardJumpInterval = options["forwardJumpInterval"] as? NSNumber ?? forwardJumpInterval
         backwardJumpInterval = options["backwardJumpInterval"] as? NSNumber ?? backwardJumpInterval
 
-        player.remoteCommands = capabilitiesStr
+        // Only update remote commands when capabilities are explicitly provided.
+        // If the key is absent (e.g. simpleUpdateOptions only sets progressUpdateEventInterval),
+        // preserve the existing command configuration so jump buttons are not accidentally cleared.
+        if let capabilitiesArr = options["capabilities"] as? [String] {
+          var capabilitiesStr = capabilitiesArr
+          if capabilitiesStr.contains("play") && capabilitiesStr.contains("pause") {
+            capabilitiesStr.append("togglePlayPause")
+          }
+          player.remoteCommands = capabilitiesStr
             .compactMap { Capability(rawValue: $0) }
             .map { capability in
                 capability.mapToPlayerCommand(
-                    forwardJumpInterval: forwardJumpInterval,
-                    backwardJumpInterval: backwardJumpInterval,
-                    likeOptions: options["likeOptions"] as? [String: Any],
-                    dislikeOptions: options["dislikeOptions"] as? [String: Any],
-                    bookmarkOptions: options["bookmarkOptions"] as? [String: Any]
+                  forwardJumpInterval: forwardJumpInterval,
+                  backwardJumpInterval: backwardJumpInterval,
+                  likeOptions: options["likeOptions"] as? [String: Any],
+                  dislikeOptions: options["dislikeOptions"] as? [String: Any],
+                  bookmarkOptions: options["bookmarkOptions"] as? [String: Any]
                 )
             }
 
-        configureProgressUpdateEvent(
-            interval: ((options["progressUpdateEventInterval"] as? NSNumber) ?? 0).doubleValue
-        )
+          // The remoteCommands didSet only calls enableRemoteCommands when currentItem != nil.
+          // When currentItem is nil (e.g. after reset()/clear() from a practice sub-page),
+          // the handlers are NOT registered with iOS MPRemoteCommandCenter. Force-sync here
+          // so that updateOptions() always registers/unregisters handlers regardless of
+          // whether a track is currently loaded.
+          player.syncRemoteCommandsWithCommandCenter()
 
+          // iOS sets nextTrackCommand and previousTrackCommand to isEnabled=true by default.
+          // SwiftAudioEx only calls disableCommand (isEnabled=false) for commands that were
+          // previously tracked in enabledCommands. Since we never register next/previous,
+          // they stay enabled and appear as grayed-out buttons in the Now Playing notification.
+          // Explicitly disable them whenever they are absent from the requested capabilities.
+          let center = MPRemoteCommandCenter.shared()
+          if !capabilitiesStr.contains(Capability.next.rawValue) {
+            center.nextTrackCommand.isEnabled = false
+          }
+          if !capabilitiesStr.contains(Capability.previous.rawValue) {
+            center.previousTrackCommand.isEnabled = false
+          }
+        }
+
+        configureProgressUpdateEvent(interval: ((options["progressUpdateEventInterval"] as? NSNumber) ?? 0).doubleValue)
         resolve(NSNull())
     }
 
@@ -461,6 +482,14 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
 
         player.stop()
         player.clear()
+
+        // avPlayer.replaceCurrentItem(with: nil) — called inside clear() — causes iOS to reset
+        // nextTrackCommand.isEnabled and previousTrackCommand.isEnabled back to true (system default).
+        // Re-disable them explicitly so grayed-out prev/next buttons never appear.
+        let center = MPRemoteCommandCenter.shared()
+        center.nextTrackCommand.isEnabled = false
+        center.previousTrackCommand.isEnabled = false
+
         resolve(NSNull())
     }
 
