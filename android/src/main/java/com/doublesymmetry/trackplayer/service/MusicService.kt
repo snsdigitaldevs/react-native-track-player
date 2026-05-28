@@ -311,11 +311,19 @@ class MusicService : HeadlessJsMediaService() {
                 mediaSession.mediaNotificationControllerInfo!!,
                 customLayout
             )
-            mediaSession.setAvailableCommands(
+            if (capabilities.isEmpty()) {
+              mediaSession.setAvailableCommands(
+                mediaSession.mediaNotificationControllerInfo!!,
+                SessionCommands.EMPTY,
+                Player.Commands.EMPTY,
+              )
+            } else {
+              mediaSession.setAvailableCommands(
                 mediaSession.mediaNotificationControllerInfo!!,
                 sessionCommandsBuilder.build(),
                 playerCommands!!
-            )
+              )
+            }
         }
     }
 
