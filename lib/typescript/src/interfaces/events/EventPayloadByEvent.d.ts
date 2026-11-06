@@ -21,6 +21,7 @@ export type EventPayloadByEvent = {
     [Event.PlayerError]: PlayerErrorEvent;
     [Event.PlaybackState]: PlaybackState;
     [Event.PlaybackError]: PlaybackErrorEvent;
+    [Event.PlaybackStalled]: never;
     [Event.PlaybackQueueEnded]: PlaybackQueueEndedEvent;
     [Event.PlaybackActiveTrackChanged]: PlaybackActiveTrackChangedEvent;
     [Event.PlaybackPlayWhenReadyChanged]: PlaybackPlayWhenReadyChangedEvent;

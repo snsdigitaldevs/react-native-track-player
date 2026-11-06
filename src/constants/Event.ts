@@ -5,6 +5,11 @@ export enum Event {
   PlaybackState = 'playback-state',
   /** Fired when a playback error occurs. */
   PlaybackError = 'playback-error',
+  /**
+   * (iOS only) Fired when playback stalls (e.g. due to network loss mid-stream)
+   * without the player reaching a failed state.
+   **/
+  PlaybackStalled = 'playback-stalled',
   /** Fired after playback has paused due to the queue having reached the end. */
   PlaybackQueueEnded = 'playback-queue-ended',
   /**

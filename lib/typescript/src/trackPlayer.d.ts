@@ -4,7 +4,7 @@ import type { AddTrack, EventPayloadByEvent, NowPlayingMetadata, PlaybackState, 
  * Initializes the player with the specified options.
  *
  * @param options The options to initialize the player with.
- * @see https://rntp.dev/docs/api/functions/lifecycle
+ * @see https://doublesymmetry.github.io/react-native-track-player/docs/api/functions/lifecycle
  */
 export declare function setupPlayer(options?: PlayerOptions): Promise<void>;
 /**
@@ -89,7 +89,7 @@ export declare function skipToPrevious(initialPosition?: number): Promise<void>;
  * Updates the configuration for the components.
  *
  * @param options The options to update.
- * @see https://rntp.dev/docs/api/functions/player#updateoptionsoptions
+ * @see https://doublesymmetry.github.io/react-native-track-player/docs/api/functions/player#updateoptionsoptions
  */
 export declare function updateOptions(options?: UpdateOptions): Promise<void>;
 /**
@@ -160,14 +160,14 @@ export declare function setRate(rate: number): Promise<void>;
  * Sets the queue.
  *
  * @param tracks The tracks to set as the queue.
- * @see https://rntp.dev/docs/api/constants/repeat-mode
+ * @see https://doublesymmetry.github.io/react-native-track-player/docs/api/constants/repeat-mode
  */
 export declare function setQueue(tracks: Track[]): Promise<void>;
 /**
  * Sets the queue repeat mode.
  *
  * @param repeatMode The repeat mode to set.
- * @see https://rntp.dev/docs/api/constants/repeat-mode
+ * @see https://doublesymmetry.github.io/react-native-track-player/docs/api/constants/repeat-mode
  */
 export declare function setRepeatMode(mode: RepeatMode): Promise<RepeatMode>;
 /**
@@ -209,13 +209,13 @@ export declare function getProgress(): Promise<Progress>;
 /**
  * Gets the playback state of the player.
  *
- * @see https://rntp.dev/docs/api/constants/state
+ * @see https://doublesymmetry.github.io/react-native-track-player/docs/api/constants/state
  */
 export declare function getPlaybackState(): Promise<PlaybackState>;
 /**
  * Gets the queue repeat mode.
  *
- * @see https://rntp.dev/docs/api/constants/repeat-mode
+ * @see https://doublesymmetry.github.io/react-native-track-player/docs/api/constants/repeat-mode
  */
 export declare function getRepeatMode(): Promise<RepeatMode>;
 /**

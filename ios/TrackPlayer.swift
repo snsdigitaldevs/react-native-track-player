@@ -39,6 +39,7 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
         player.event.receiveCommonMetadata.addListener(self, handleAudioPlayerCommonMetadataReceived)
         player.event.stateChange.addListener(self, handleAudioPlayerStateChange)
         player.event.fail.addListener(self, handleAudioPlayerFailed)
+        player.event.playbackStalled.addListener(self, handlePlaybackStalled)
         player.event.currentItem.addListener(self, handleAudioPlayerCurrentItemChange)
         player.event.secondElapse.addListener(self, handleAudioPlayerSecondElapse)
         player.event.playWhenReadyChange.addListener(self, handlePlayWhenReadyChange)
@@ -770,6 +771,10 @@ public class NativeTrackPlayerImpl: NSObject, AudioSessionControllerDelegate {
 
     func handleAudioPlayerFailed(error: Error?) {
         emit(event: EventType.PlaybackError, body: ["error": error?.localizedDescription])
+    }
+
+    func handlePlaybackStalled() {
+        emit(event: EventType.PlaybackStalled)
     }
 
     func handleAudioPlayerCurrentItemChange(
