@@ -800,9 +800,11 @@ class MusicService : HeadlessJsMediaService() {
 
     @MainThread
     override fun onDestroy() {
+        // Always release the session, even if player never initialized, else the next onCreate hits "Session ID must be unique"
+        if (::mediaSession.isInitialized) mediaSession.release()
+        if (::fakePlayer.isInitialized) fakePlayer.release()
         if (::player.isInitialized) {
-            Timber.d("Releasing media session and destroying player")
-            mediaSession.release()
+            Timber.d("Destroying player")
             player.destroy()
         }
 
